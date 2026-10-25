@@ -1,0 +1,48 @@
+[
+  {
+    "id": "rag-001",
+    "question": "What is Jon Snow's relationship with Samwell Tarly?",
+    "expected_behavior": "answer_from_context",
+    "required_terms": ["Samwell", "Night"],
+    "expected_route": "RETRIEVAL",
+    "thread_id": "eval-rag-001"
+  },
+  {
+    "id": "rag-002",
+    "question": "What is Jon Snow's favorite modern smartphone?",
+    "expected_behavior": "abstain",
+    "required_terms": ["I don't know"],
+    "expected_route": "RETRIEVAL",
+    "thread_id": "eval-rag-002"
+  },
+  {
+    "id": "calc-001",
+    "question": "Calculate 125 * 48",
+    "expected_behavior": "contains_terms",
+    "required_terms": ["6000"],
+    "expected_route": "CALCULATOR",
+    "thread_id": "eval-calc-001"
+  },
+  {
+    "id": "calc-002",
+    "question": "What is 144 divided by 12?",
+    "expected_behavior": "contains_terms",
+    "required_terms": ["12"],
+    "expected_route": "CALCULATOR",
+    "thread_id": "eval-calc-002"
+  },
+  {
+    "id": "web-001",
+    "question": "What are the latest developments in artificial intelligence?",
+    "expected_behavior": "web_sources",
+    "expected_route": "WEB_SEARCH",
+    "thread_id": "eval-web-001"
+  },
+  {
+    "id": "chat-001",
+    "question": "Hello, how are you?",
+    "expected_behavior": "nonempty_answer",
+    "expected_route": "CONVERSATIONAL",
+    "thread_id": "eval-chat-001"
+  }
+]

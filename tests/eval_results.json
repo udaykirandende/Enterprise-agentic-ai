@@ -1,0 +1,151 @@
+{
+  "passed": 6,
+  "total": 6,
+  "pass_rate_percent": 100.0,
+  "average_latency_seconds": 13.29,
+  "results": [
+    {
+      "id": "rag-001",
+      "passed": true,
+      "checks": {
+        "answer": true,
+        "route": true
+      },
+      "behavior_detail": "Checked required answer terms.",
+      "expected_route": "RETRIEVAL",
+      "thought_process": [
+        "Intent: Retrieval",
+        "Search: What is Jon Snow's relationship with Samwell Tarly?",
+        "Qdrant retrieval",
+        "FlashRank reranking",
+        "Response generated"
+      ],
+      "status": "Completed",
+      "latency_seconds": 12.77,
+      "answer": "Jon Snow and Samwell Tarly are comrades in the Night’s Watch and close friends.  \n- In one passage Jon goes to Maester Aemon “to ask that Samwell Tarly be taken from training and accepted as a brother of the Night’s Watch,” showing Jon is advocating for Sam’s place in the order.  \n- Later, after Sam’s emotional breakdown, “Jon Snow laughed with him,” and the two sit together with Ghost, indicating a personal friendship.  \n- Their introductions also make clear they are fellow recruits: Sam says, “My name is Samwell Tarly… I’ve come to take the black,” and Jon replies, “I’m Jon Snow, Ned Stark’s bastard, of Winterfell.”  \n\nThus, Jon Snow is Samwell Tarly’s fellow Night’s Watch brother and friend, and he looks out for him within the Watch.",
+      "source_count": 5,
+      "sources": [
+        "SOURCE: GAME OF THRONES.pdf\nVECTOR_SCORE: 0.67477864\nRERANK_SCORE: 0.9976231455802917\nCONTENT: everything?” he asked. “I \ndon’t understand. If you are truly so craven, why are you here? Why would a coward \nwant to join the Night’s Watch?”\nSamwell Tarly looked at him for a long moment, and his round face seemed to cave in on \nitself. He sat down on the frost-covered ground and began to cry, huge choking sobs that \nmade his whole body shake. Jon Snow could only stand and watch. Like the snowfall on \nthe barrowlands, it seemed the tears would never end.\nIt was Ghost who knew what to do. Silent as shadow, the pale direwolf moved closer and \nbegan to lick the warm tears off Samwell Tarly’s face. The fat boy cried out, \nstartled . . . and somehow, in a heartbeat, his sobs turned to laughter. Jon Snow laughed with him. Afterward they sat on the frozen ground, huddled in their \ncloaks with Ghost between them. Jon told the story of how he and Robb had found the \npups newborn in the late summer snows. It seemed a thousand years ago now. Before \nlong he found himself talking of Winterfell.",
+        "SOURCE: GAME OF THRONES.pdf\nVECTOR_SCORE: 0.5783719\nRERANK_SCORE: 0.9894262552261353\nCONTENT: ken you, Maester,” Jon Snow said.\n“You did not wake me,” Maester Aemon replied. “I find I need less sleep as I grow older, \nand I am grown very old. I often spend half the night with ghosts, remembering times \nfifty years past as if they were yesterday. The mystery of a midnight visitor is a welcome \ndiversion. So tell me, Jon Snow, why have you come calling at this strange hour?”\n“To ask that Samwell Tarly be taken from training and accepted as a brother of the \nNight’s Watch.”\n“This is no concern of Maester Aemon,” Chett complained.\n“Our Lord Commander has given the training of recruits into the hands of Ser Alliser \nThorne,” the maester said gently. “Only he may say when a boy is ready to swear his vow, \nas you surely know. Why then come to me?” “The Lord Commander listens to you,” Jon told him. “And the wounded and the sick of \nthe Night’s Watch are in your charge.”\n“And is your friend Samwell wounded or sick?”\n“He will be,” Jon promised, “unless you help.”\nHe told them all of it,",
+        "SOURCE: GAME OF THRONES.pdf\nVECTOR_SCORE: 0.6069063\nRERANK_SCORE: 0.9881584048271179\nCONTENT: emptying \naround them.\nBlood matted the fat boy’s hair where Halder had split his helm asunder. “My name is \nSamwell Tarly, of Horn . . . ” He stopped and licked his lips. “I mean, I was of Horn Hill, \nuntil I . . . left. I’ve come to take the black. My father is Lord Randyll, a bannerman to the \nTyrells of Highgarden. I used to be his heir, only . . . ” His voice trailed off.\n“I’m Jon Snow, Ned Stark’s bastard, of Winterfell.”\nSamwell Tarly nodded. “I . . . if you want, you can call me Sam. My mother calls me \nSam.”\n“You can call him Lord Snow,” Pyp said as he came up to join them. “You don’t want to \nknow what his mother calls him.”\n“These two are Grenn and Pypar,” Jon said.\n“Grenn’s the ugly one,” Pyp said.\nGrenn scowled. “You’re uglier than me. At least I don’t have ears like a bat.”\n“My thanks to all of you,” the fat boy said gravely.\n“Why didn’t you get up and fight?” Grenn demanded.\n“I wanted to, truly. I just . . . I couldn’t. I didn’t want him to hit me anymore.” He looked \na",
+        "SOURCE: GAME OF THRONES.pdf\nVECTOR_SCORE: 0.55144787\nRERANK_SCORE: 0.956952691078186\nCONTENT: with him. They descended to the yard in silence. Outside, Jon \nlooked up at the Wall shining in the sun, the melting ice creeping down its side in a \nhundred thin fingers. Jon’s rage was such that he would have smashed it all in an \ninstant, and the world be damned. “Jon,” Samwell Tarly said excitedly. “Wait. Don’t you see what they’re doing?”\nJon turned on him in a fury. “I see Ser Alliser’s bloody hand, that’s all I see. He wanted \nto shame me, and he has.”\nDareon gave him a look. “The stewards are fine for the likes of you and me, Sam, but not \nfor Lord Snow.”\n“I’m a better swordsman and a better rider than any of you,” Jon blazed back. “It’s not \nfair!”\n“Fair?” Dareon sneered. “The girl was waiting for me, naked as the day she was born. \nShe pulled me through the window, and you talk to me of fair?” He walked off.\n“There is no shame in being a steward,” Sam said.\n“Do you think I want to spend the rest of my life washing an old man’s smallclothes?”\n“The old man is Lord Commander of",
+        "SOURCE: GAME OF THRONES.pdf\nVECTOR_SCORE: 0.5661363\nRERANK_SCORE: 0.9116100072860718\nCONTENT: Dickon was there. He \nwanted his heir at his side, don’t you see? To watch and listen and learn from all he did. \nI’ll wager that’s why Lord Mormont requested you, Jon. What else could it be? He wants \nto groom you for command!”\nJon was taken aback. It was true, Lord Eddard had often made Robb part of his councils \nback at Winterfell. Could Sam be right? Even a bastard could rise high in the Night’s \nWatch, they said. “I never asked for this,” he said stubbornly.\n“None of us are here for asking,” Sam reminded him.\nAnd suddenly Jon Snow was ashamed. Craven or not, Samwell Tarly had found the courage to accept his fate like a man. On the \nWall, a man gets only what he earns, Benjen Stark had said the last night Jon had seen \nhim alive. You’re no ranger, Jon, only a green boy with the smell of summer still on \nyou. He’d heard it said that bastards grow up faster than other children; on the Wall, \nyou grew up or you died.\nJon let out a deep sigh. “You have the right of it. I was acting th"
+      ]
+    },
+    {
+      "id": "rag-002",
+      "passed": true,
+      "checks": {
+        "answer": true,
+        "route": true
+      },
+      "behavior_detail": "Expected an explicit abstention.",
+      "expected_route": "RETRIEVAL",
+      "thought_process": [
+        "Intent: Retrieval",
+        "Search: What is Jon Snow's favorite modern smartphone?",
+        "Qdrant retrieval",
+        "FlashRank reranking",
+        "Response generated"
+      ],
+      "status": "Completed",
+      "latency_seconds": 7.93,
+      "answer": "I don’t know.",
+      "source_count": 5,
+      "sources": [
+        "SOURCE: GAME OF THRONES.pdf\nVECTOR_SCORE: 0.37346965\nRERANK_SCORE: 0.0003322753182146698\nCONTENT: you, not one in twenty was ever rich \nenough to own a real sword.” His look was grim. “So how do you like the taste of your \nvictories now, Lord Snow?”\n“Don’t call me that!” Jon said sharply, but the force had gone out of his anger. Suddenly \nhe felt ashamed and guilty. “I never . . .  I didn’t think . . . ”\n“Best you start thinking,” Noye warned him. “That, or sleep with a dagger by your bed. \nNow go.”\nBy the time Jon left the armory, it was almost midday. The sun had broken through the \nclouds. He turned his back on it and lifted his eyes to the Wall, blazing blue and \ncrystalline in the sunlight. Even after all these weeks, the sight of it still gave him the \nshivers. Centuries of windblown dirt had pocked and scoured it, covering it like a film, \nand it often seemed a pale grey, the color of an overcast sky . . . but when the sun caught \nit fair on a bright day, it shone, alive with light, a colossal blue-white cliff that filled up \nhalf the sky.\nThe largest structure ever built b",
+        "SOURCE: GAME OF THRONES.pdf\nVECTOR_SCORE: 0.34841493\nRERANK_SCORE: 0.00021883715817239136\nCONTENT: the same kind of dreams.”\n“No,” Jon Snow said, horrified. “I wouldn’t . . . ”\n“No? Never?” Tyrion raised an eyebrow. “Well, no doubt the Starks have been terribly \ngood to you. I’m certain Lady Stark treats you as if you were one of her own. And your \nbrother Robb, he’s always been kind, and why not? He gets Winterfell and you get the \nWall. And your father . . . he must have good reasons for packing you off to the Night’s \nWatch . . . ”\n“Stop it,” Jon Snow said, his face dark with anger. “The Night’s Watch is a noble calling!”\nTyrion laughed. “You’re too smart to believe that. The Night’s Watch is a midden heap \nfor all the misfits of the realm. I’ve seen you looking at Yoren and his boys. Those are \nyour new brothers, Jon Snow, how do you like them? Sullen peasants, debtors, poachers, \nrapers, thieves, and bastards like you all wind up on the Wall, watching for grumkins \nand snarks and all the other monsters your wet nurse warned you about. The good part \nis there are no grumkins or",
+        "SOURCE: GAME OF THRONES.pdf\nVECTOR_SCORE: 0.38924277\nRERANK_SCORE: 0.00016667980526108295\nCONTENT: t Jon, a faint half smile on his lips. One-armed Donal Noye stood in the door of \nthe armory. “The gods be with you, Snow,” he called out.\nSomething’s wrong, Jon thought. Something’s very wrong.\nThe dead men were carried to one of the storerooms along the base of the Wall, a dark \ncold cell chiseled from the ice and used to keep meat and grain and sometimes even  beer. Jon saw that Mormont’s horse was fed and watered and groomed before he took \ncare of his own. Afterward he sought out his friends. Grenn and Toad were on watch, but \nhe found Pyp in the common hall. “What’s happened?” he asked.\nPyp lowered his voice. “The king’s dead.”\nJon was stunned. Robert Baratheon had looked old and fat when he visited Winterfell, \nyet he’d seemed hale enough, and there’d been no talk of illness. “How can you know?”\n“One of the guards overheard Clydas reading the letter to Maester Aemon.” Pyp leaned \nclose. “Jon, I’m sorry. He was your father’s friend, wasn’t he?”\n“They were as close as brothers, on",
+        "SOURCE: GAME OF THRONES.pdf\nVECTOR_SCORE: 0.4079192\nRERANK_SCORE: 0.00012066840281477198\nCONTENT: ’s \ncertain to be a ranger. He’s the best sword and the best rider among us, and his uncle \nwas the First before he . . . ” His voice trailed off awkwardly as he realized what he had \nalmost said.\n“Benjen Stark is still First Ranger,” Jon Snow told him, toying with his bowl of \nblueberries. The rest might have given up all hope of his uncle’s safe return, but not him. \nHe pushed away the berries, scarcely touched, and rose from the bench.\n“Aren’t you going to eat those?” Toad asked.\n“They’re yours.” Jon had hardly tasted Hobb’s great feast. “I could not eat another bite.” \nHe took his cloak from its hook near the door and shouldered his way out.\nPyp followed him. “Jon, what is it?”\n“Sam,” he admitted. “He was not at table tonight.”\n“It’s not like him to miss a meal,” Pyp said thoughtfully. “Do you suppose he’s taken ill?”\n“He’s frightened. We’re leaving him.” He remembered the day he had left Winterfell, all \nthe bittersweet farewells; Bran lying broken, Robb with snow in his hair, Ary",
+        "SOURCE: GAME OF THRONES.pdf\nVECTOR_SCORE: 0.35276788\nRERANK_SCORE: 0.00010857226880034432\nCONTENT: armed his hands in the steam rising \nfrom the bowl. The smell made his mouth water.\n“Snow.”\nJon knew Alliser Thorne’s voice, but there was a curious note in it that he had not heard \nbefore. He turned.\n“The Lord Commander wants to see you. Now.” For a moment Jon was too frightened to move. Why would the Lord Commander want \nto see him? They had heard something about Benjen, he thought wildly, he was dead, the \nvision had come true. “Is it my uncle?” he blurted. “Is he returned safe?”\n“The Lord Commander is not accustomed to waiting,” was Ser Alliser’s reply. “And I am \nnot accustomed to having my commands questioned by bastards.”\nTyrion Lannister swung off the bench and rose. “Stop it, Thorne. You’re frightening the \nboy.”\n“Keep out of matters that don’t concern you, Lannister. You have no place here.”\n“I have a place at court, though,” the dwarf said, smiling. “A word in the right ear, and \nyou’ll die a sour old man before you get another boy to train. Now tell Snow why the Old \nBear"
+      ]
+    },
+    {
+      "id": "calc-001",
+      "passed": true,
+      "checks": {
+        "answer": true,
+        "route": true
+      },
+      "behavior_detail": "Checked required answer terms.",
+      "expected_route": "CALCULATOR",
+      "thought_process": [
+        "Intent: Calculator",
+        "Expression: 125 * 48",
+        "Calculator executed"
+      ],
+      "status": "Completed",
+      "latency_seconds": 2.76,
+      "answer": "Result: 6000",
+      "source_count": 0,
+      "sources": []
+    },
+    {
+      "id": "calc-002",
+      "passed": true,
+      "checks": {
+        "answer": true,
+        "route": true
+      },
+      "behavior_detail": "Checked required answer terms.",
+      "expected_route": "CALCULATOR",
+      "thought_process": [
+        "Intent: Calculator",
+        "Expression: 144 divided by 12",
+        "Calculator executed"
+      ],
+      "status": "Completed",
+      "latency_seconds": 9.21,
+      "answer": "Result: 12.0",
+      "source_count": 0,
+      "sources": []
+    },
+    {
+      "id": "web-001",
+      "passed": true,
+      "checks": {
+        "answer": true,
+        "route": true
+      },
+      "behavior_detail": "Found 5 source entries containing URLs.",
+      "expected_route": "WEB_SEARCH",
+      "thought_process": [
+        "Intent: Web Search",
+        "Search query: What are the latest developments in artificial intelligence?",
+        "Web search executed",
+        "Web results synthesized"
+      ],
+      "status": "Completed",
+      "latency_seconds": 31.02,
+      "answer": "**Key recent advances in artificial intelligence (2025‑2026)**  \n\n| Area | What’s new | Why it matters |\n|------|------------|----------------|\n| **Action‑oriented AI** | Systems are being built to *take actions* (e.g., trigger workflows, update databases) instead of only generating text or answers. | Moves AI from “talk‑only” to real‑world impact for businesses. |\n| **Multimodal generative models** | The GPT‑5 family can ingest **text, audio, images and video** and respond with any of those modalities; other models (e.g., Llama 4, Mistral Large 3) are also multimodal. | Enables richer interfaces such as visual‑question answering, audio‑driven support, and video‑based content creation. |\n| **Tool‑use / function‑calling** | Models like **Mistral Large 2** can call external functions, pull live data, run checks and write results back. | Turns chat‑style models into programmable assistants that can execute tasks on behalf of users. |\n| **Model choice as a product decision** | Companies now mix proprietary (e.g., **OpenAI GPT‑5.2**) with open‑weight (e.g., **Llama 4**) and other vendor models (e.g., **Mistral Large 3**) to meet cost, latency, and data‑privacy goals. | Makes AI a selectable component of a product stack rather than a one‑size‑fits‑all service. |\n| **Edge / “data‑close” AI** | More workloads run on‑device or near the data source, reducing latency and preserving privacy. | Critical for IoT, mobile, and real‑time applications (e.g., smart cameras, industrial sensors). |\n| **AI agents that cooperate** | Meta is investing in agents that **communicate directly** with each other; Nvidia’s **Nemo Claw** platform and several Chinese startups (AutoClaw, MaxClaw, WorkBuddy) provide enterprise‑grade agent frameworks. | Allows complex, autonomous workflows where multiple agents coordinate without human micromanagement. |\n| **Regulatory & audit focus** | New “prove‑it‑works” paperwork, audits, and rule‑sets are being added to AI deployments. | Helps enterprises satisfy compliance and risk‑management requirements. |\n| **AI in biotech** | An **AI‑designed universal vaccine** completed its first human trial (June 2026), the first vaccine whose key component was created entirely by AI. | Demonstrates AI’s potential to accelerate drug/vaccine discovery and respond to pandemics. |\n| **Domain‑specific breakthroughs** | Continued progress in **autonomous vehicles**, **smart grids**, and other adaptive systems that learn from",
+      "source_count": 5,
+      "sources": [
+        "Title: AI Trends 2026: Key Advancements, Innovations, and Future Insights\nURL: https://innowise.com/blog/ai-trends\nSnippet: So what are the latest developments in artificial intelligence that actually matter for business? The ones that survive contact with the real world: Systems that can take actions, not just talk. Generative models that handle more than text. AI that runs closer to where data lives (including devices). More rules, more audits, more “prove it works” paperwork. Scroll on to learn more! If you’re planning something serious this year, start with a scoped AI consulting effort. Of course, it is NOT magical. But it’s cheaper than building the wrong thing, then pretending it was “a learning project”. ## How artificial intelligence and machine learning evolved [...] Here are the recent AI developments (and what teams keep paying for): Model choice is now a real product decision. Teams mix OpenAI’s GPT-5.2 with open(-weight) options like Llama 4 and vendor models like Mistral Large 3. Multimodal is standard now. GPT-5 family can take text, audio, images, and video, then respond with text, audio, and images, which fits support, sales, training, and internal tools. Chat is turning into tool use. Models like Mistral Large 2 can call functions, pull data, run checks, and write results back. Media...",
+        "Title: The Biggest AI Announcements Right Now : r/AISEOInsider\nURL: https://www.reddit.com/r/AISEOInsider/comments/1rs1o1v/latest_ai_news_the_biggest_ai_announcements_right\nSnippet: Despite those issues Meta still decided to acquire the company. The founders were brought into Meta’s artificial intelligence research division. Meta believes the future of digital systems involves AI agents communicating with each other directly. Instead of humans coordinating everything manually, AI agents could exchange information and complete tasks automatically. # Nvidia Nemo Claw Signals AI Agent Expansion Another major development appearing in the latest AI news comes from Nvidia. The company is developing an AI agent platform called Nemo Claw. This system is designed as an enterprise alternative to platforms similar to OpenClaw. OpenClaw became popular because it allows AI agents to operate computers directly. [...] Raising more than a billion dollars for a small research-focused company highlights the scale of investment flowing into artificial intelligence. # China Launches Multiple AI Agent Platforms China is also contributing several developments to the latest AI news. Multiple companies launched AI agent platforms within a short period of time. Tools such as AutoClaw, MaxClaw, and WorkBuddy were introduced by different companies. These platforms allow AI agents to...",
+        "Title: The Latest AI News and Breakthroughs That Matter Most | News\nURL: https://www.crescendo.ai/news/latest-ai-news-and-updates\nSnippet: Source:SecurityWeek ### (AI Breakthrough) AI-Designed Universal Vaccine Passes First Human Trial Date: June 14, 2026 Summary: Researchers at the University of Cambridge announced that an artificial intelligence-designed vaccine has successfully completed initial human trials, marking the first time a vaccine's key component was designed entirely by AI and then trialed in humans. The breakthrough achievement demonstrates AI's capacity to develop fundamentally new vaccine types potentially capable of protecting against diverse viruses and preventing future pandemics. The research consortium describes the vaccine as a transformational advance in medical AI applications, opening pathways for rapid vaccine development against emerging infectious disease threats. Source:WION News [...] Also, don't forget to check out our other AI news and development pages for more AI updates: The Latest AI News: March and April 2026 The Latest AI News: January and February 2026‍ The Latest AI News: August to December 2025‍ AI Development in Healthcare Industry in 2026‍ Venture Investment Rounds in AI Businesses - Latest Updates Now, let's explore the latest news for AI advancements and developments...",
+        "Title: Advancements in AI and Machine Learning: The Future Unveiled\nURL: https://online-engineering.case.edu/blog/advancements-in-artificial-intelligence-and-machine-learning\nSnippet: ML models, through their learning capabilities, continuously improve their predictions and decisions as they process more data, so systems can adapt to changing environments and operational conditions dynamically. This rapid adaptation improves the capabilities of existing systems and allows for the development of innovative solutions, such as autonomous vehicles and smart grids, that were once considered impractical.1 This article will explore the latest advancements in artificial intelligence and machine learning, including recent development of advanced algorithms. ## Deep Learning and Neural Networks",
+        "Title: What are some latest AI developments?\nURL: https://www.reddit.com/r/ArtificialInteligence/comments/1m5q2yr/what_are_some_latest_ai_developments\nSnippet: I would like to stay informed about the latest developments in the field of artificial intelligence."
+      ]
+    },
+    {
+      "id": "chat-001",
+      "passed": true,
+      "checks": {
+        "answer": true,
+        "route": true
+      },
+      "behavior_detail": "Expected a non-empty answer.",
+      "expected_route": "CONVERSATIONAL",
+      "thought_process": [
+        "Intent: Conversational",
+        "Conversation context considered",
+        "Response generated"
+      ],
+      "status": "Completed",
+      "latency_seconds": 16.05,
+      "answer": "Hello! I’m doing well, thank you. How can I assist you today?",
+      "source_count": 0,
+      "sources": []
+    }
+  ]
+}
