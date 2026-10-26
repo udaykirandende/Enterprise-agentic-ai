@@ -12,7 +12,7 @@ A FastAPI application that routes user requests through a LangGraph workflow for
 - **Guardrails and observability:** NeMo Guardrails and Logfire instrumentation.
 - **API:** FastAPI query endpoint and a workflow graph endpoint.
 
-> **Scope and limitations:** This is a tool-routed LangGraph RAG application, not yet a system of independently collaborating specialist agents. `MemorySaver` is in-memory and does not survive process restarts. No accuracy, latency, or production-load results are claimed until measured with a repeatable evaluation run.
+> **Scope and limitations:** This is a tool-routed LangGraph RAG application, not yet a system of independently collaborating specialist agents. `MemorySaver` is in-memory and does not survive process restarts. The repository contains a six-case evaluation snapshot (6/6 passed, 13.29 s mean latency); it is a small recorded run, not a statistically robust accuracy benchmark or a production-load test. It has not been rerun in this session.
 
 ## Architecture
 
@@ -108,6 +108,22 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/query -ContentType "ap
 ```
 
 The response includes the question, answer, status, plan trace, and source documents when available.
+
+## Evaluation snapshot
+
+The checked-in `tests/eval_results.json` records these six cases as passing:
+
+| Case | Type | Recorded latency |
+|---|---|---:|
+| rag-001 | Retrieval answer from document context | 12.77 s |
+| rag-002 | Abstention when the answer is not in context | 7.93 s |
+| calc-001 | Calculator: multiplication | 2.76 s |
+| calc-002 | Calculator: division | 9.21 s |
+| web-001 | Web search with sources | 31.02 s |
+| chat-001 | Conversational response | 16.05 s |
+| **Overall** | **6/6 cases passed (100% on this small suite)** | **13.29 s mean** |
+
+These are the values in the committed result file, not a fresh run from this session. They should be described as a **six-case evaluation pass rate**, not general model accuracy. Latency varies with provider, network, cold starts, and model routing.
 
 ## Tests
 
