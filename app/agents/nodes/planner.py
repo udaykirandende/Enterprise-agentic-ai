@@ -103,7 +103,7 @@ RETRIEVAL
         decision = str(llm.invoke(prompt).content).strip().upper()
 
         match = re.search(
-            r"\b(CONVERSATIONAL|CALCULATOR|WEB_SEARCH|RETRIEVAL)\b",
+            r"\b(CONVERSATIONAL|CALCULATOR|WEB_SEARCH|MCP_TOOL|RETRIEVAL)\b",
             decision,
         )
         decision = match.group(1) if match else "RETRIEVAL"
@@ -125,7 +125,7 @@ RETRIEVAL
             "plan": ["Intent: Calculator", f"Expression: {expression}"],
         }
 
-    if decision == "WEB_SEARCH":
+    if decision == "MCP_TOOL":\n        return {\n            "route": decision,\n            "current_query": user_message,\n            "status": "Selecting approved MCP tool",\n            "plan": ["Intent: MCP Tool", f"Request: {user_message}"],\n        }\n\n    if decision == "WEB_SEARCH":
         return {
             "route": decision,
             "current_query": user_message,
