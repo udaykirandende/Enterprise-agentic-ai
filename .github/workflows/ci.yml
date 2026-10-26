@@ -28,6 +28,6 @@ jobs:
       - name: Compile Python source
         run: python -m compileall -q app tests
       - name: Run isolated unit tests
-        run: pytest -q tests/test_tool_nodes.py tests/test_mcp_tools.py
+        run: pytest -q tests/test_tool_nodes.py tests/test_mcp_tools.py tests/test_persistent_checkpoint.py
       - name: Build Docker image
         run: docker build --tag enterprise-agentic-rag:ci .
