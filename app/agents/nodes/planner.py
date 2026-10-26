@@ -125,7 +125,15 @@ RETRIEVAL
             "plan": ["Intent: Calculator", f"Expression: {expression}"],
         }
 
-    if decision == "MCP_TOOL":\n        return {\n            "route": decision,\n            "current_query": user_message,\n            "status": "Selecting approved MCP tool",\n            "plan": ["Intent: MCP Tool", f"Request: {user_message}"],\n        }\n\n    if decision == "WEB_SEARCH":
+    if decision == "MCP_TOOL":
+        return {
+            "route": decision,
+            "current_query": user_message,
+            "status": "Selecting approved MCP tool",
+            "plan": ["Intent: MCP Tool", f"Request: {user_message}"],
+        }
+
+    if decision == "WEB_SEARCH":
         return {
             "route": decision,
             "current_query": user_message,
