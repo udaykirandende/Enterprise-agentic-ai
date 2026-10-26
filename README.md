@@ -125,21 +125,34 @@ pytest -q tests/test_memory.py
 
 For repeatable retrieval quality evaluation, configure a representative test dataset and record metrics such as retrieval hit rate, answer correctness, citation/source correctness, latency, and token/cost usage. Do not publish unmeasured metrics as project results.
 
-## Docker
+## Docker and Docker Compose
 
-Build:
+1. Copy `.env.example` to `.env` and fill in the required provider credentials. Keep `.env` private.
+2. Create a local `data` folder and put documents to ingest inside it. The ingestion loader supports PDF, HTML, TXT, DOCX, and PPTX files.
+3. Start the API and persistent local Qdrant service:
+
+   ```powershell
+   docker compose up --build -d
+   ```
+
+4. Ingest documents into Qdrant (the command below **recreates the collection**, so use it only when you intend to replace the indexed data):
+
+   ```powershell
+   docker compose run --rm api python -m app.ingestion.processor /app/data --wipe
+   ```
+
+5. Open http://127.0.0.1:8000/docs. Check the API root at http://127.0.0.1:8000/ and Qdrant at http://127.0.0.1:6333/dashboard.
+
+Stop the stack with `docker compose down`. Persistent Qdrant data remains in the `qdrant_storage` volume; `docker compose down -v` deletes that volume.
+
+For a standalone image build:
 
 ```powershell
 docker build -t enterprise-agentic-rag .
-```
-
-Run (provide secrets through environment variables or an untracked environment file):
-
-```powershell
 docker run --rm -p 8000:8000 --env-file .env enterprise-agentic-rag
 ```
 
-Then open http://127.0.0.1:8000/docs. The container image runs the API; Qdrant and external model/search providers remain separate services.
+The API container still depends on configured external model-gateway and guardrail providers. Docker Compose supplies Qdrant locally; it does not supply API keys or populate the knowledge base automatically.
 
 ## Security notes
 
