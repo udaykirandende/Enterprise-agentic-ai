@@ -154,10 +154,10 @@ These are the values in the committed result file, not a fresh run from this ses
 Run the isolated unit tests that do not require live provider credentials:
 
 ```powershell
-pytest -q tests/test_tool_nodes.py tests/test_mcp_tools.py
+pytest -q tests/test_tool_nodes.py tests/test_mcp_tools.py tests/test_persistent_checkpoint.py
 ```
 
-The memory tests in `tests/test_memory.py` call a running API. Start the app and run them separately:
+The PostgreSQL persistence integration test is skipped unless `DATABASE_URL` points to a disposable test database. The memory tests in `tests/test_memory.py` call a running API. Start the app and run them separately:
 
 ```powershell
 pytest -q tests/test_memory.py
