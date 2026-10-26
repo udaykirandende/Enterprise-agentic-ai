@@ -92,7 +92,9 @@ Important routing rules:
 - Do not route a question to RETRIEVAL merely because it is phrased
   as a factual question if the answer is already stated in conversation.
 - Do not route a request to CONVERSATIONAL if it genuinely requires
-  calculation, current web information, local document retrieval, or an MCP tool.\n- Choose MCP_TOOL only when the user asks for an action or capability likely supplied\n  by a configured MCP server; do not use it for ordinary web searches.
+  calculation, current web information, local document retrieval, or an MCP tool.
+- Choose MCP_TOOL only when the user asks for an action or capability likely supplied
+  by a configured MCP server; do not use it for ordinary web searches.
 - Never assume that missing conversation details exist.
 - Return only one label.
 
