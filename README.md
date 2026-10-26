@@ -10,7 +10,8 @@ A FastAPI application that routes user requests through a LangGraph workflow for
 - **Calculator:** restricted expression evaluation.
 - **Conversation memory:** PostgreSQL-backed LangGraph checkpoints when `DATABASE_URL` is configured; `MemorySaver` is a local/test fallback.
 - **Guardrails and observability:** NeMo Guardrails and Logfire instrumentation.
-- **MCP integration:** Optional MCP server connections with an explicit tool allowlist (`MCP_ALLOWED_TOOLS`).\n- **API:** FastAPI query endpoint and a workflow graph endpoint.
+- **MCP integration:** Optional MCP server connections with an explicit tool allowlist (`MCP_ALLOWED_TOOLS`).
+- **API:** FastAPI query endpoint and a workflow graph endpoint.
 
 > **Scope and limitations:** This is a tool-routed LangGraph application, not a system of independently collaborating specialist agents. Durable memory requires `DATABASE_URL` to point to PostgreSQL; without it, memory is process-local. MCP is optional and only invokes explicitly allowlisted tools. The checked-in six-case evaluation snapshot is historical and is not a fresh test run or a production accuracy benchmark.
 
@@ -31,6 +32,7 @@ LangGraph planner
   |---- RETRIEVAL ---------> Qdrant search -> FlashRank rerank -> Responder
   |---- WEB_SEARCH --------> Tavily search -> Responder
   |---- CALCULATOR --------> Restricted calculator ------------> Response
+  |---- MCP_TOOL ----------> Allowlisted MCP tool -----------------> Response
 ```
 
 ## Requirements
@@ -96,7 +98,10 @@ Open:
 | `PORTKEY_API_KEY` | Portkey gateway credential |
 | `GROQ_SLUG`, `GROQ_SLUG_2` | Required by runtime configuration validation where invoked |
 | `LOGFIRE_TOKEN` | Optional Logfire token for telemetry |
-| `TAVILY_API_KEY` | Tavily key for web search; required for that feature |\n| `DATABASE_URL` | PostgreSQL connection string for durable conversation checkpoints |\n| `MCP_SERVERS_JSON` | JSON object configuring one or more MCP servers; optional |\n| `MCP_ALLOWED_TOOLS` | Comma-separated exact MCP tool names allowed to execute |
+| `TAVILY_API_KEY` | Tavily key for web search; required for that feature |
+| `DATABASE_URL` | PostgreSQL connection string for durable conversation checkpoints |
+| `MCP_SERVERS_JSON` | JSON object configuring one or more MCP servers; optional |
+| `MCP_ALLOWED_TOOLS` | Comma-separated exact MCP tool names allowed to execute |
 
 Use the provider's current dashboard to verify model IDs and gateway configuration. Do not assume that example model identifiers or gateway configuration IDs are valid for every account.
 
