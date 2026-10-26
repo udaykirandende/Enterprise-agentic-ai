@@ -76,6 +76,10 @@ The user requests a mathematical calculation.
 WEB_SEARCH:
 The user needs current information or explicitly requests an internet search.
 
+MCP_TOOL:
+The user explicitly asks to use an external connected tool or MCP capability.
+Use this only for requests requiring a configured MCP server, not ordinary web search.
+
 RETRIEVAL:
 The user needs information from the local knowledge base, documents,
 or technical evidence not established by the conversation history.
@@ -96,6 +100,7 @@ Valid labels:
 CONVERSATIONAL
 CALCULATOR
 WEB_SEARCH
+MCP_TOOL
 RETRIEVAL
 """
 
