@@ -85,10 +85,10 @@ async def _execute_mcp_async(query: str) -> dict[str, Any]:
     ])
     calls = getattr(response, "tool_calls", None) or []
     if not calls:
-        answer = getattr(response, "content", "")
+        answer = str(getattr(response, "content", ""))
         return {
             "status": "Completed",
-            "final_answer": str(answer),
+            "final_answer": answer,
             "plan": ["MCP evaluated approved tools; no tool call was needed"],
         }
 
@@ -131,13 +131,18 @@ def execute_mcp_request(query: str) -> dict[str, Any]:
 def mcp_tool_node(state: dict[str, Any]) -> dict[str, Any]:
     query = str(state.get("current_query", "")).strip()
     if not query:
+        answer = "Please provide a request for the MCP tool."
         return {
             "status": "Tool input error",
-            "final_answer": "Please provide a request for the MCP tool.",
+            "final_answer": answer,
+            "messages": [{"role": "assistant", "content": answer}],
             "plan": list(state.get("plan", [])) + ["MCP skipped: empty request"],
         }
     result = execute_mcp_request(query)
+    answer = str(result.get("final_answer", ""))
     return {
         **result,
+        "final_answer": answer,
+        "messages": [{"role": "assistant", "content": answer}],
         "plan": list(state.get("plan", [])) + result.get("plan", []),
     }
