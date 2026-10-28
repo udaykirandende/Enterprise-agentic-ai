@@ -12,6 +12,32 @@ def generate_node(state: AgentState) -> dict[str, Any]:
     route = state.get("route", "RETRIEVAL")
     query = state.get("current_query", "")
 
+    # The retriever has already decided that evidence is missing or could not
+    # be verified. Return its message without spending another LLM call.
+    retrieval_stop_statuses = {
+        "No relevant evidence found",
+        "Relevance check failed",
+        "Retrieval failed",
+        "Empty retrieval query",
+    }
+    status = state.get("status", "")
+    if route == "RETRIEVAL" and status in retrieval_stop_statuses:
+        answer = state.get("final_answer") or (
+            "I couldn't find verified, relevant information in the knowledge base."
+        )
+        plan = state.get("plan", [])
+        logfire.info(
+            "RAG response returned without LLM call",
+            status=status,
+        )
+        return {
+            "final_answer": answer,
+            "messages": [{"role": "assistant", "content": answer}],
+            "status": status,
+            "plan": plan + ["Stopped before response generation: no verified evidence"],
+            "documents": [],
+        }
+
     history_lines = []
     messages = state.get("messages", [])
 
