@@ -8,11 +8,12 @@ A FastAPI application that routes user requests through a LangGraph workflow for
 - **Retrieval-augmented generation:** Qdrant vector search, sentence-transformer embeddings, and FlashRank reranking.
 - **Web search:** Tavily search with optional explicit domain restrictions.
 - **Calculator:** restricted expression evaluation.
-- **Conversation memory:** LangGraph `MemorySaver` keeps state by thread ID while the process is running.
+- **Conversation memory:** PostgreSQL-backed LangGraph checkpoints when `DATABASE_URL` is configured; `MemorySaver` is a local/test fallback.
 - **Guardrails and observability:** NeMo Guardrails and Logfire instrumentation.
+- **MCP integration:** Optional MCP server connections with an explicit tool allowlist (`MCP_ALLOWED_TOOLS`).
 - **API:** FastAPI query endpoint and a workflow graph endpoint.
 
-> **Scope and limitations:** This is a tool-routed LangGraph RAG application, not yet a system of independently collaborating specialist agents. `MemorySaver` is in-memory and does not survive process restarts. The repository contains a six-case evaluation snapshot (6/6 passed, 13.29 s mean latency); it is a small recorded run, not a statistically robust accuracy benchmark or a production-load test. It has not been rerun in this session.
+> **Scope and limitations:** This is a tool-routed LangGraph application, not a system of independently collaborating specialist agents. Durable memory requires `DATABASE_URL` to point to PostgreSQL; without it, memory is process-local. MCP is optional and only invokes explicitly allowlisted tools. The checked-in six-case evaluation snapshot is historical and is not a fresh test run or a production accuracy benchmark.
 
 ## Architecture
 
@@ -31,6 +32,7 @@ LangGraph planner
   |---- RETRIEVAL ---------> Qdrant search -> FlashRank rerank -> Responder
   |---- WEB_SEARCH --------> Tavily search -> Responder
   |---- CALCULATOR --------> Restricted calculator ------------> Response
+  |---- MCP_TOOL ----------> Allowlisted MCP tool -----------------> Response
 ```
 
 ## Requirements
@@ -97,8 +99,30 @@ Open:
 | `GROQ_SLUG`, `GROQ_SLUG_2` | Required by runtime configuration validation where invoked |
 | `LOGFIRE_TOKEN` | Optional Logfire token for telemetry |
 | `TAVILY_API_KEY` | Tavily key for web search; required for that feature |
+| `DATABASE_URL` | PostgreSQL connection string for durable conversation checkpoints |
+| `MCP_SERVERS_JSON` | JSON object configuring one or more MCP servers; optional |
+| `MCP_ALLOWED_TOOLS` | Comma-separated exact MCP tool names allowed to execute |
 
 Use the provider's current dashboard to verify model IDs and gateway configuration. Do not assume that example model identifiers or gateway configuration IDs are valid for every account.
+
+## Durable conversation memory
+
+Set `DATABASE_URL` to a PostgreSQL database accessible from the API process. On startup, the app initializes the LangGraph PostgreSQL checkpointer; if the database is unreachable or checkpoint setup fails, startup fails instead of silently claiming persistence. Keep the connection string in the host's secret/environment settings, never in source control.
+
+When a request omits `thread_id`, the API generates a new UUID and returns it in the response. Send that returned ID on later requests to continue the same conversation. Clients should use a distinct thread ID per conversation and must not share IDs between users. The API does not implement user authentication, so production deployments should bind conversation IDs to authenticated identities.
+
+Without `DATABASE_URL`, the app uses in-memory `MemorySaver` for local development and tests; state is lost on process restart.
+
+## MCP tools
+
+MCP is optional. Configure `MCP_SERVERS_JSON` with the server configuration format supported by `langchain-mcp-adapters`, and set `MCP_ALLOWED_TOOLS` to the exact comma-separated tool names that may execute. Example for a Streamable HTTP server:
+
+```dotenv
+MCP_SERVERS_JSON={"example":{"transport":"streamable_http","url":"https://your-mcp-server.example/mcp"}}
+MCP_ALLOWED_TOOLS=approved_tool_name
+```
+
+The example URL and tool name are placeholders, not a working server. Do not enable tools that can execute arbitrary code, access secrets, or perform destructive actions without additional authorization. MCP tool calls are selected by the model but checked against the allowlist before execution. MCP requests fail closed when no server or allowed tool is configured. Verify the actual names returned by your server before setting the allowlist.
 
 ## API example
 
@@ -111,7 +135,7 @@ The response includes the question, answer, status, plan trace, and source docum
 
 ## Evaluation snapshot
 
-The checked-in `tests/eval_results.json` records these six cases as passing:
+The checked-in `tests/eval_results.json` is a historical snapshot of six cases. To run the current live evaluation, start the API with valid model/Qdrant/Tavily configuration and run `python -m tests.evaluate_rag` (or set `AGENT_API_URL` to a different endpoint). The runner records mean and p95 latency plus request errors. The checked-in snapshot is not updated by CI. It records these six cases as passing:
 
 | Case | Type | Recorded latency |
 |---|---|---:|
@@ -127,13 +151,13 @@ These are the values in the committed result file, not a fresh run from this ses
 
 ## Tests
 
-Run the unit tests that do not require live provider credentials:
+Run the isolated unit tests that do not require live provider credentials:
 
 ```powershell
-pytest -q tests/test_tool_nodes.py
+pytest -q tests/test_tool_nodes.py tests/test_mcp_tools.py tests/test_persistent_checkpoint.py
 ```
 
-The memory tests in `tests/test_memory.py` call a running API. Start the app and run them separately:
+The PostgreSQL persistence integration test is skipped unless `DATABASE_URL` points to a disposable test database. The memory tests in `tests/test_memory.py` call a running API. Start the app and run them separately:
 
 ```powershell
 pytest -q tests/test_memory.py

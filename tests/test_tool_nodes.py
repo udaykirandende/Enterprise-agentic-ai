@@ -113,9 +113,7 @@ def test_retrieval_preserves_source_and_scores(mock_search, mock_rerank):
     assert result["documents"][0].endswith(
         "Samwell Tarly becomes Jon's friend."
     )
-    assert result["status"] == (
-        "Retrieved 2 candidates; selected 2 after reranking."
-    )
+    assert result["status"] == "Retrieved 2 relevant chunks."
     mock_search.assert_called_once_with(
         "Who is Jon Snow's friend?", limit=25
     )

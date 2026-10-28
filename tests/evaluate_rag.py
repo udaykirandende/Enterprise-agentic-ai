@@ -1,12 +1,14 @@
 ﻿
 import json
+import math
+import os
 import re
 import time
 from pathlib import Path
 
 import requests
 
-BASE_URL = "http://127.0.0.1:8000/query"
+BASE_URL = os.getenv("AGENT_API_URL", "http://127.0.0.1:8000/query")
 TESTS_DIR = Path(__file__).parent
 CASES_FILE = TESTS_DIR / "eval_cases.json"
 RESULTS_FILE = TESTS_DIR / "eval_results.json"
@@ -16,6 +18,7 @@ ROUTE_ALIASES = {
     "CALCULATOR": ("intent: calculator",),
     "WEB_SEARCH": ("intent: web search",),
     "CONVERSATIONAL": ("intent: conversational",),
+    "MCP_TOOL": ("intent: mcp tool",),
 }
 
 
@@ -201,12 +204,22 @@ def main():
         if "latency_seconds" in result
     ]
 
+    sorted_latencies = sorted(latencies)
+    p95_latency = (
+        sorted_latencies[max(0, math.ceil(0.95 * len(sorted_latencies)) - 1)]
+        if sorted_latencies
+        else None
+    )
+    error_count = sum("error" in result for result in results)
+
     summary = {
         "passed": passed,
         "total": total,
         "pass_rate_percent": round(
             passed / total * 100, 2
         ),
+        "p95_latency_seconds": p95_latency,
+        "request_error_count": error_count,
         "average_latency_seconds": (
             round(sum(latencies) / len(latencies), 2)
             if latencies
@@ -223,6 +236,8 @@ def main():
     print("\n=== Summary ===")
     print(f"Passed: {passed}/{total}")
     print(f"Pass rate: {summary['pass_rate_percent']}%")
+    print(f"P95 latency: {summary['p95_latency_seconds']}s")
+    print(f"Request errors: {summary['request_error_count']}")
     print(
         "Average latency: "
         f"{summary['average_latency_seconds']}s"

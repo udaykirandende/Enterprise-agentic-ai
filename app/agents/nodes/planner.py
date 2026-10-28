@@ -76,6 +76,10 @@ The user requests a mathematical calculation.
 WEB_SEARCH:
 The user needs current information or explicitly requests an internet search.
 
+MCP_TOOL:
+The user explicitly asks to use an external connected tool or MCP capability.
+Use this only for requests requiring a configured MCP server, not ordinary web search.
+
 RETRIEVAL:
 The user needs information from the local knowledge base, documents,
 or technical evidence not established by the conversation history.
@@ -88,7 +92,9 @@ Important routing rules:
 - Do not route a question to RETRIEVAL merely because it is phrased
   as a factual question if the answer is already stated in conversation.
 - Do not route a request to CONVERSATIONAL if it genuinely requires
-  calculation, current web information, or local document retrieval.
+  calculation, current web information, local document retrieval, or an MCP tool.
+- Choose MCP_TOOL only when the user asks for an action or capability likely supplied
+  by a configured MCP server; do not use it for ordinary web searches.
 - Never assume that missing conversation details exist.
 - Return only one label.
 
@@ -96,6 +102,7 @@ Valid labels:
 CONVERSATIONAL
 CALCULATOR
 WEB_SEARCH
+MCP_TOOL
 RETRIEVAL
 """
 
@@ -103,7 +110,7 @@ RETRIEVAL
         decision = str(llm.invoke(prompt).content).strip().upper()
 
         match = re.search(
-            r"\b(CONVERSATIONAL|CALCULATOR|WEB_SEARCH|RETRIEVAL)\b",
+            r"\b(CONVERSATIONAL|CALCULATOR|WEB_SEARCH|MCP_TOOL|RETRIEVAL)\b",
             decision,
         )
         decision = match.group(1) if match else "RETRIEVAL"
@@ -123,6 +130,14 @@ RETRIEVAL
             "current_query": expression,
             "status": "Calculating expression",
             "plan": ["Intent: Calculator", f"Expression: {expression}"],
+        }
+
+    if decision == "MCP_TOOL":
+        return {
+            "route": decision,
+            "current_query": user_message,
+            "status": "Selecting approved MCP tool",
+            "plan": ["Intent: MCP Tool", f"Request: {user_message}"],
         }
 
     if decision == "WEB_SEARCH":

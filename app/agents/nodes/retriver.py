@@ -1,4 +1,3 @@
-
 import logfire
 
 from app.agents.state import AgentState
@@ -9,15 +8,32 @@ from app.services.retrival.ranking_service import rerank_documents_with_scores
 CANDIDATE_TOP_K = 25
 RERANK_TOP_K = 5
 
+# Initial cutoff based on the observed relevant (~0.64) and irrelevant
+# (~0.00001) examples. Validate against more queries before treating it as final.
+MIN_RERANK_SCORE = 0.1
+
+
+def _no_evidence_result(plan: list[str]) -> dict:
+    return {
+        "documents": [],
+        "final_answer": (
+            "I couldn't find relevant information in the knowledge-base "
+            "documents to answer that question."
+        ),
+        "status": "No relevant evidence found",
+        "plan": plan + ["Relevance check: no chunks passed the score threshold"],
+    }
+
 
 def retrieve_node(state: AgentState) -> dict:
-    """Retrieve candidates from Qdrant and rerank them with FlashRank."""
+    """Retrieve, rerank, and reject chunks that do not meet the relevance cutoff."""
     query = state.get("current_query", "").strip()
     plan = state.get("plan", [])
 
     if not query:
         return {
             "documents": [],
+            "final_answer": "Please provide a question to search the knowledge base.",
             "status": "Empty retrieval query",
             "plan": plan + ["Retrieval skipped: empty query"],
         }
@@ -46,18 +62,73 @@ def retrieve_node(state: AgentState) -> dict:
                 requested_top_k=CANDIDATE_TOP_K,
             )
 
+        if not candidates:
+            return _no_evidence_result(plan + ["Qdrant retrieval"])
+
         ranked = rerank_documents_with_scores(
             query=query,
             documents=[item["content"] for item in candidates],
             top_n=RERANK_TOP_K,
         )
 
-        # Map the ranked text back to source metadata.
-        # A list handles repeated identical chunk text safely.
+        # The reranker returns None scores if it fails. Do not pass unverified
+        # candidates to the LLM when relevance could not be assessed.
+        scored_items = [
+            item for item in ranked
+            if isinstance(item.get("rerank_score"), (int, float))
+        ]
+        if not scored_items:
+            logfire.warning(
+                "Relevance check could not be completed",
+                candidate_count=len(candidates),
+            )
+            return {
+                "documents": [],
+                "final_answer": (
+                    "I couldn't verify document relevance because the reranking "
+                    "step failed. Please try again."
+                ),
+                "status": "Relevance check failed",
+                "plan": plan + [
+                    "Qdrant retrieval",
+                    "FlashRank reranking failed or returned no scores",
+                ],
+            }
+
+        accepted = [
+            item for item in scored_items
+            if item["rerank_score"] >= MIN_RERANK_SCORE
+        ]
+
+        logfire.info(
+            "RAG relevance threshold applied",
+            candidate_count=len(candidates),
+            reranked_count=len(scored_items),
+            accepted_count=len(accepted),
+            minimum_rerank_score=MIN_RERANK_SCORE,
+        )
+
+        if not accepted:
+            return _no_evidence_result(
+                plan + [
+                    "Qdrant retrieval",
+                    "FlashRank reranking",
+                    f"Relevance threshold: {MIN_RERANK_SCORE}",
+                ]
+            )
+
+        # Map accepted ranked text back to source metadata. A list handles
+        # repeated identical chunk text safely.
         remaining = candidates.copy()
         formatted_docs = []
+        accepted_texts = {item["text"] for item in accepted}
 
         for item in ranked:
+            if item.get("text") not in accepted_texts:
+                continue
+            if not isinstance(item.get("rerank_score"), (int, float)):
+                continue
+
             match_index = next(
                 (
                     index for index, candidate in enumerate(remaining)
@@ -82,18 +153,20 @@ def retrieve_node(state: AgentState) -> dict:
             )
 
         logfire.info(
-            "Knowledge retrieval and reranking completed",
+            "Relevant knowledge chunks selected",
             retrieved_count=len(candidates),
-            final_count=len(formatted_docs),
+            accepted_count=len(formatted_docs),
+            minimum_rerank_score=MIN_RERANK_SCORE,
         )
 
         return {
             "documents": formatted_docs,
-            "status": (
-                f"Retrieved {len(candidates)} candidates; "
-                f"selected {len(formatted_docs)} after reranking."
-            ),
-            "plan": plan + ["Qdrant retrieval", "FlashRank reranking"],
+            "status": f"Retrieved {len(formatted_docs)} relevant chunks.",
+            "plan": plan + [
+                "Qdrant retrieval",
+                "FlashRank reranking",
+                f"Relevance threshold passed: {MIN_RERANK_SCORE}",
+            ],
         }
 
     except Exception as exc:
@@ -103,6 +176,10 @@ def retrieve_node(state: AgentState) -> dict:
         )
         return {
             "documents": [],
+            "final_answer": (
+                "Knowledge-base retrieval failed, so I couldn't verify an answer. "
+                "Please try again."
+            ),
             "status": "Retrieval failed",
             "plan": plan + ["Knowledge retrieval failed"],
         }
