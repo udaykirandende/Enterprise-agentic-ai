@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from app.agents.nodes.calculator import calculator_node
 from app.agents.nodes.mcp_tools import execute_mcp_request, mcp_tool_node
 
 
@@ -27,14 +28,17 @@ def test_mcp_requires_allowlist(monkeypatch):
     assert "allowlisted" in result["final_answer"]
 
 
-def test_mcp_node_skips_empty_query():
+def test_mcp_node_skips_empty_query_and_saves_answer_to_history():
     result = mcp_tool_node({"current_query": "  ", "plan": ["Start"]})
 
     assert result["status"] == "Tool input error"
     assert result["plan"][-1] == "MCP skipped: empty request"
+    assert result["messages"] == [
+        {"role": "assistant", "content": result["final_answer"]}
+    ]
 
 
-def test_mcp_node_appends_execution_trace():
+def test_mcp_node_appends_execution_trace_and_answer_to_history():
     with patch(
         "app.agents.nodes.mcp_tools.execute_mcp_request",
         return_value={
@@ -49,6 +53,9 @@ def test_mcp_node_appends_execution_trace():
 
     assert result["final_answer"] == "Tool result"
     assert result["plan"][-1] == "MCP tool executed: approved_tool"
+    assert result["messages"] == [
+        {"role": "assistant", "content": "Tool result"}
+    ]
 
 
 def test_mcp_executes_only_allowlisted_tool(monkeypatch):
@@ -105,3 +112,26 @@ def test_mcp_executes_only_allowlisted_tool(monkeypatch):
     assert calls == [("approved_tool", {"query": "sample"})]
     assert result["status"] == "Completed"
     assert result["plan"] == ["MCP tool executed: approved_tool"]
+
+
+def test_calculator_saves_successful_answer_to_history():
+    with patch("app.agents.nodes.calculator.calculate", return_value=175):
+        result = calculator_node({"current_query": "25 * 7", "plan": []})
+
+    assert result["final_answer"] == "Result: 175"
+    assert result["messages"] == [
+        {"role": "assistant", "content": "Result: 175"}
+    ]
+
+
+def test_calculator_saves_input_error_to_history():
+    with patch(
+        "app.agents.nodes.calculator.calculate",
+        side_effect=ValueError("Invalid expression"),
+    ):
+        result = calculator_node({"current_query": "invalid", "plan": []})
+
+    assert result["status"] == "Tool input error"
+    assert result["messages"] == [
+        {"role": "assistant", "content": result["final_answer"]}
+    ]
