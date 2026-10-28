@@ -1,4 +1,4 @@
-﻿import logfire
+import logfire
 
 from app.agents.state import AgentState
 from app.tools.calculator import calculate
@@ -16,6 +16,7 @@ def calculator_node(state: AgentState) -> dict:
         return {
             "tool_result": answer,
             "final_answer": answer,
+            "messages": [{"role": "assistant", "content": answer}],
             "status": "Completed",
             "plan": state.get("plan", []) + ["Calculator executed"],
         }
@@ -26,6 +27,7 @@ def calculator_node(state: AgentState) -> dict:
         return {
             "tool_result": answer,
             "final_answer": answer,
+            "messages": [{"role": "assistant", "content": answer}],
             "status": "Tool input error",
             "plan": state.get("plan", []) + ["Calculator input rejected"],
         }
