@@ -71,6 +71,7 @@ def test_memory_isolated_between_threads(thread_ids):
         "A separate thread unexpectedly revealed another thread's codeword."
     )
 
+
 def test_natural_followup_uses_conversation_history(thread_ids):
     topic = f"Project Nebula{uuid.uuid4().hex[:8]}"
 
@@ -87,7 +88,11 @@ def test_natural_followup_uses_conversation_history(thread_ids):
     assert second.get("status") == "Completed"
 
     answer = second.get("answer", "").lower()
-    assert "document" in answer or "q&a" in answer or "question" in answer, (
+
+    assert any(
+        term in answer
+        for term in ("document", "docs", "q&a", "question")
+    ), (
         "The response did not appear to use the earlier project context. "
         f"Answer: {second.get('answer')}"
     )

@@ -16,7 +16,18 @@ from app.ingestion.chunking.splitter import chunk_text
 from app.services.retrival.embeddings import embed_texts, get_embedding_dim
 
 
-logfire.configure(service_name="UDAY-CHATBOT")
+logfire_token = os.getenv("LOGFIRE_TOKEN")
+
+if logfire_token:
+    logfire.configure(
+        token=logfire_token,
+        service_name="UDAY-CHATBOT",
+    )
+else:
+    logfire.configure(
+        send_to_logfire=False,
+        service_name="UDAY-CHATBOT",
+    )
 
 processed_data_dir = "processed_data"
 

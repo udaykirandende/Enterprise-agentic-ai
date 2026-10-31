@@ -9,7 +9,12 @@ from fastapi import FastAPI, Response
 from pydantic import BaseModel, Field
 
 load_dotenv()
-logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
+logfire_token = os.getenv("LOGFIRE_TOKEN")
+
+if logfire_token:
+    logfire.configure(token=logfire_token)
+else:
+    logfire.configure(send_to_logfire=False)
 
 from app.agents import graph as graph_module
 from app.guardrails import initialize_rails, guard

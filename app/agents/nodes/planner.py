@@ -1,9 +1,11 @@
 ﻿
-from app.agents.state import AgentState
+import re
+
 import logfire
 from langchain_groq import ChatGroq
+
+from app.agents.state import AgentState
 from app.config import settings
-import re
 
 
 llm = ChatGroq(
@@ -14,15 +16,26 @@ llm = ChatGroq(
 )
 
 
+VALID_INTENTS = {
+    "CONVERSATIONAL",
+    "CALCULATOR",
+    "WEB_SEARCH",
+    "MCP_TOOL",
+    "RETRIEVAL",
+}
+
+
 def get_message_content(message) -> str:
     if isinstance(message, dict):
         return str(message.get("content", ""))
+
     return str(getattr(message, "content", ""))
 
 
 def get_message_role(message) -> str:
     if isinstance(message, dict):
         return str(message.get("role", "user")).lower()
+
     return str(getattr(message, "type", "user")).lower()
 
 
@@ -30,30 +43,42 @@ def planner_node(state: AgentState) -> dict:
     messages = state.get("messages", [])
 
     history_lines = []
+
     for message in messages[:-1]:
         role = get_message_role(message)
         content = get_message_content(message)
+
         speaker = (
             "Assistant"
             if role in ("assistant", "ai")
             else "User"
         )
+
         history_lines.append(f"{speaker}: {content}")
 
     history = "\n".join(history_lines)
 
     latest_message = messages[-1] if messages else None
+
     user_message = (
         get_message_content(latest_message)
         if latest_message is not None
         else state.get("current_query", "")
-    )
+    ).strip()
 
     prompt = f"""
-You are the intent classifier for an enterprise AI agent.
+You are a precise intent classifier for an enterprise AI agent.
 
-Use BOTH the conversation history and the latest user message.
-Determine what the user is asking now, including references to earlier turns.
+Your task is to classify the LATEST user request.
+
+The system follows a LOCAL-FIRST knowledge strategy:
+
+1. Try the application's local knowledge base for general
+   factual and knowledge-based questions.
+2. If relevant local evidence is not found, the graph will
+   automatically fall back to web search.
+3. Explicit requests for current information or internet
+   searches can go directly to web search.
 
 Conversation history:
 {history if history else "(No previous conversation messages.)"}
@@ -61,42 +86,128 @@ Conversation history:
 Latest user message:
 {user_message}
 
-Choose exactly one intent:
+Choose exactly ONE route.
 
-CONVERSATIONAL:
-Greetings, ordinary conversation, requests to rephrase or explain
-a previous answer, follow-up questions answerable from conversation
-history, and questions asking what the user previously stated.
-Use this route when the answer is available from the conversation
-history and no external tool or knowledge-base lookup is needed.
+1. CONVERSATIONAL
 
-CALCULATOR:
-The user requests a mathematical calculation.
+Choose this when:
+- The user greets the assistant.
+- The user engages in ordinary casual conversation.
+- The user asks to rephrase or simplify a previous answer.
+- The answer is already available in conversation history.
+- The user asks a follow-up that depends on previous
+  conversation context rather than external evidence.
 
-WEB_SEARCH:
-The user needs current information or explicitly requests an internet search.
+Do NOT choose this merely because a question is short.
 
-MCP_TOOL:
-The user explicitly asks to use an external connected tool or MCP capability.
-Use this only for requests requiring a configured MCP server, not ordinary web search.
+2. CALCULATOR
 
-RETRIEVAL:
-The user needs information from the local knowledge base, documents,
-or technical evidence not established by the conversation history.
-Use this route for document questions and factual questions requiring
-retrieved evidence.
+Choose this when:
+- The user requests arithmetic.
+- The user asks to calculate, evaluate, or compute an expression.
+- The requested answer requires numerical computation.
 
-Important routing rules:
-- Resolve pronouns and references such as "it", "that", and "the first
-  approach" using conversation history.
-- Do not route a question to RETRIEVAL merely because it is phrased
-  as a factual question if the answer is already stated in conversation.
-- Do not route a request to CONVERSATIONAL if it genuinely requires
-  calculation, current web information, local document retrieval, or an MCP tool.
-- Choose MCP_TOOL only when the user asks for an action or capability likely supplied
-  by a configured MCP server; do not use it for ordinary web searches.
-- Never assume that missing conversation details exist.
-- Return only one label.
+3. WEB_SEARCH
+
+Choose this when:
+- The user explicitly requests an internet or web search.
+- The user asks for current, latest, recent, or up-to-date information.
+- The user requests live information.
+- The user asks for current prices, weather, news, or live events.
+- The user asks for the latest software version or release.
+- The user explicitly requests external sources or online verification.
+- The user asks to verify an unfamiliar entity's existence or
+  an official release date.
+
+Do NOT choose WEB_SEARCH just because a question is factual,
+technical, about a public person, or about a company.
+
+4. MCP_TOOL
+
+Choose this only when:
+- The user explicitly requests an action through a configured
+  external MCP server.
+- The request requires a capability provided by an available MCP tool.
+
+Do not choose MCP_TOOL for ordinary web searches or calculations.
+
+5. RETRIEVAL
+
+Choose this for:
+- General factual questions.
+- Questions about people, places, organizations, and events.
+- Questions about books, films, fictional characters, and stories.
+- General technical and programming questions.
+- Questions about concepts, definitions, and explanations.
+- Questions that may be answered from uploaded documents.
+- Questions about the application's local knowledge base.
+- Questions where local evidence should be checked before
+  using external web information.
+
+Also choose RETRIEVAL when the user explicitly refers to an
+uploaded PDF, file, or locally indexed document.
+
+The graph will handle the next step:
+- Relevant evidence found: answer using local RAG.
+- No relevant evidence found: automatically use web search.
+- Retrieval infrastructure failure: report the failure rather
+  than silently treating it as a normal evidence miss.
+
+ROUTING EXAMPLES:
+
+"Who is Jon Snow?"
+RETRIEVAL
+
+"Who is Cristiano Ronaldo?"
+RETRIEVAL
+
+"Explain machine learning."
+RETRIEVAL
+
+"What is LangGraph?"
+RETRIEVAL
+
+"What is the latest stable LangGraph version?"
+WEB_SEARCH
+
+"Who won the 2024 Formula One Drivers' Championship?"
+RETRIEVAL
+
+"Who won today's Formula One race?"
+WEB_SEARCH
+
+"What is the current price of Bitcoin?"
+WEB_SEARCH
+
+"According to the uploaded PDF, who is Jon Snow?"
+RETRIEVAL
+
+"Find the answer in my Game of Thrones document."
+RETRIEVAL
+
+"Calculate 25 * (4 + 3)."
+CALCULATOR
+
+"Explain your previous answer in simpler words."
+CONVERSATIONAL
+
+"Hello, how are you?"
+CONVERSATIONAL
+
+"Search the internet for the latest LangGraph documentation."
+WEB_SEARCH
+
+"Use the configured MCP server to perform this action."
+MCP_TOOL
+
+FINAL RULES:
+- Use conversation history to resolve pronouns and references.
+- Do not classify general factual questions as conversational.
+- Prefer RETRIEVAL for general knowledge questions.
+- Prefer WEB_SEARCH for explicit internet searches and current information.
+- Prefer CALCULATOR for numerical calculations.
+- Prefer MCP_TOOL only for configured MCP actions.
+- Return exactly one valid label and nothing else.
 
 Valid labels:
 CONVERSATIONAL
@@ -107,18 +218,31 @@ RETRIEVAL
 """
 
     with logfire.span("Classifying user intent"):
-        decision = str(llm.invoke(prompt).content).strip().upper()
+        raw_decision = str(llm.invoke(prompt).content).strip().upper()
 
         match = re.search(
             r"\b(CONVERSATIONAL|CALCULATOR|WEB_SEARCH|MCP_TOOL|RETRIEVAL)\b",
-            decision,
+            raw_decision,
         )
-        decision = match.group(1) if match else "RETRIEVAL"
 
-        logfire.info("Intent identified", route=decision)
+        if match:
+            decision = match.group(1)
+            classifier_fallback = False
+        else:
+            # Local-first default when the model returns an invalid label.
+            decision = "RETRIEVAL"
+            classifier_fallback = True
+
+        logfire.info(
+            "Intent identified",
+            route=decision,
+            classifier_fallback=classifier_fallback,
+            raw_decision=raw_decision,
+        )
 
     if decision == "CALCULATOR":
-        expression = user_message.strip().lower()
+        expression = user_message.lower()
+
         expression = re.sub(
             r"^(what is|calculate|compute|evaluate|please calculate)\s+",
             "",
@@ -129,7 +253,10 @@ RETRIEVAL
             "route": decision,
             "current_query": expression,
             "status": "Calculating expression",
-            "plan": ["Intent: Calculator", f"Expression: {expression}"],
+            "plan": [
+                "Intent: Calculator",
+                f"Expression: {expression}",
+            ],
         }
 
     if decision == "MCP_TOOL":
@@ -137,18 +264,28 @@ RETRIEVAL
             "route": decision,
             "current_query": user_message,
             "status": "Selecting approved MCP tool",
-            "plan": ["Intent: MCP Tool", f"Request: {user_message}"],
+            "plan": [
+                "Intent: MCP Tool",
+                f"Request: {user_message}",
+            ],
         }
 
     if decision == "WEB_SEARCH":
+        plan = [
+            "Intent: Web Search",
+            f"Search query: {user_message}",
+        ]
+
+        if classifier_fallback:
+            plan.append(
+                "Invalid classifier output; defaulted to local retrieval."
+            )
+
         return {
             "route": decision,
             "current_query": user_message,
             "status": "Searching the web",
-            "plan": [
-                "Intent: Web Search",
-                f"Search query: {user_message}",
-            ],
+            "plan": plan,
         }
 
     if decision == "CONVERSATIONAL":
@@ -165,9 +302,9 @@ RETRIEVAL
     return {
         "route": "RETRIEVAL",
         "current_query": user_message,
-        "status": "Technical query detected",
+        "status": "Searching local knowledge base",
         "plan": [
             "Intent: Retrieval",
-            f"Search: {user_message}",
+            f"Knowledge-base query: {user_message}",
         ],
     }

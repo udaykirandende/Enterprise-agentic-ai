@@ -170,10 +170,11 @@ def retrieve_node(state: AgentState) -> dict:
         }
 
     except Exception as exc:
-        logfire.error(
-            "Knowledge retrieval failed",
-            error_type=type(exc).__name__,
-        )
+        logfire.exception(
+    "Knowledge retrieval failed",
+    error_type=type(exc).__name__,
+    error_message=str(exc),
+       )
         return {
             "documents": [],
             "final_answer": (

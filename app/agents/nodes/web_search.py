@@ -177,10 +177,11 @@ def web_search_node(state: AgentState) -> dict:
         }
 
     except Exception as exc:
-        logfire.error(
-            "Web search failed",
-            error_type=type(exc).__name__,
-        )
+        logfire.exception(
+    "Web search failed",
+    error_type=type(exc).__name__,
+    error_message=str(exc),
+   )
 
         message = (
             "Web search failed. Check the Tavily API key, "
