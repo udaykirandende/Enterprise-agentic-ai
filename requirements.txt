@@ -17,11 +17,9 @@ FlashRank
 nemoguardrails
 
 logfire
-
 beautifulsoup4
 unstructured
 pypdf
-
 tavily-python
 langchain-tavily
 pytest
